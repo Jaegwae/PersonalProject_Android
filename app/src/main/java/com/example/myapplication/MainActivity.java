@@ -2,11 +2,16 @@ package com.example.myapplication;
 
 import static android.content.ContentValues.TAG;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -24,16 +29,15 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    TextView textView;
-    Bundle nums = new Bundle();
-    int j = 0;  //0부터 크롤링한 데이터 값 넣기 (페이지 변화해도 그 번호 그대로 올라갈 수 있도록)
+    Bundle nums = new Bundle(); //크롤링 데이터 저장용
+    int j = 0;  //0부터 크롤링한 데이터 값 넣기 (페이지 변화해도 그 번호 그대로 올라갈 수 있도록) 또한 J값만큼 데이터가 들어가있다고 판단 가능
+    private LinearLayout container; //부모 뷰
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView = (TextView) findViewById(R.id.number);
-        final Bundle bundle = new Bundle();
+        container = (LinearLayout) findViewById(R.id.layout);   //부모뷰 지정
 
         new Thread(){
             @Override
@@ -74,11 +78,33 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
-            textView.setText(bundle.getString("title26"));   //이런식으로 View를 메인 쓰레드에서 뿌려줘야한다.
+            for(int i = 0; i<j; i++){
+                textview(bundle.getString("title"+i));  //이런식으로 View를 메인 쓰레드에서 뿌려줘야한다. // 텍스트 뷰 생성
+            }
         }
     };
 
+
+    public void textview(String a){ //텍스트 뷰 동적생성
+        //TextView 생성
+        TextView view1 = new TextView(this);
+        view1.setText(a);
+        view1.setTextSize(12);
+        view1.setTextColor(Color.BLACK);
+
+        //layout_width, layout_height, gravity 설정
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.LEFT;
+        view1.setLayoutParams(lp);
+
+        //부모 뷰에 추가
+        container.addView(view1);
+    }
+
+
 }
+
+
 
 
 
