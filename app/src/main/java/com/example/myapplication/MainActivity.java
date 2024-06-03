@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -27,17 +28,21 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    Bundle nums = new Bundle(); //크롤링 데이터 저장용
-    int j = 0;  //0부터 크롤링한 데이터 값 넣기 (페이지 변화해도 그 번호 그대로 올라갈 수 있도록) 또한 J값만큼 데이터가 들어가있다고 판단 가능
+    int j = 0;  //0부터 크롤링한 데이터 값 넣기 (페이지 변화해도 그 번호 그대로 올라갈 수 있도록) 또한 J값만큼 Bundle안에 데이터가 들어가있다고 판단 가능
     private LinearLayout container; //부모 뷰
+    List<LP> lpList = new ArrayList<>();
+    ListView listview;
+    ListAdapter adpter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        container = (LinearLayout) findViewById(R.id.layout);   //부모뷰 지정
+        this.listview = findViewById(R.id.listview);
 
         new Thread(){
             @Override
@@ -48,24 +53,30 @@ public class MainActivity extends AppCompatActivity {
 
                         for(; j < i*25; j++) {
                             if(i==1){
-                                Elements contents = doc.select(".bo3");
-                                nums.putString("title"+j,contents.get(j).text());
-                                contents = doc.select(".ss_p2");
-                                nums.putString("value"+j,contents.get(j).text());
+                                lpList.add(
+                                        new LP(doc.select(".bo3").get(j).text(),
+                                                doc.select(".ss_p2").get(j).text()
+                                        )
+                                );
                             }
                             else{
-                                Elements contents = doc.select(".bo3");
-                                nums.putString("title"+j,contents.get(j-((i-1)*25)).text());    //2번째페이지의 첫번째 데이터는 0부터 시작하기 때문에
-                                contents = doc.select(".ss_p2");
-                                nums.putString("value"+j,contents.get(j-((i-1)*25)).text());    //2번째페이지의 첫번째 데이터는 0부터 시작하기 때문에
+                                lpList.add(
+                                        new LP(doc.select(".bo3").get(j-((i-1)*25)).text(),
+                                                doc.select(".ss_p2").get(j-((i-1)*25)).text()
+                                        )
+                                );
                             }
                         }
                     }
 
 
-                    Message msg = handler.obtainMessage();  //핸들러를 이용해서 Thread()에서 가져온 데이터를 메인 쓰레드에 보내준다.
-                    msg.setData(nums);
-                    handler.sendMessage(msg);
+
+                    adpter = new ListAdapter(lpList);
+
+                    runOnUiThread(() -> {
+                        listview.setAdapter(adpter);
+                    });
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -73,34 +84,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
     }
-
-    Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            Bundle bundle = msg.getData();
-            for(int i = 0; i<j; i++){
-                textview(bundle.getString("title"+i));  //이런식으로 View를 메인 쓰레드에서 뿌려줘야한다. // 텍스트 뷰 생성
-            }
-        }
-    };
-
-
-    public void textview(String a){ //텍스트 뷰 동적생성
-        //TextView 생성
-        TextView view1 = new TextView(this);
-        view1.setText(a);
-        view1.setTextSize(12);
-        view1.setTextColor(Color.BLACK);
-
-        //layout_width, layout_height, gravity 설정
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.LEFT;
-        view1.setLayoutParams(lp);
-
-        //부모 뷰에 추가
-        container.addView(view1);
-    }
-
 
 }
 
