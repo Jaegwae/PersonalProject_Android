@@ -24,8 +24,9 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    String nums;                    //복권 번호을 저장할 변수
     TextView textView;
+    Bundle nums = new Bundle();
+    int j = 0;  //0부터 크롤링한 데이터 값 넣기 (페이지 변화해도 그 번호 그대로 올라갈 수 있도록)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,26 +42,25 @@ public class MainActivity extends AppCompatActivity {
                     for(int i = 1; i < 3; i++){
                         Document doc = Jsoup.connect("https://www.aladin.co.kr/shop/wbrowse.aspx?BrowseTarget=List&ViewRowsCount=25&ViewType=Detail&PublishMonth=0&SortOrder=6&page="+i+"&Stockstatus=1&PublishDay=84&CID=86800&SearchOption=&CustReviewRankStart=&CustReviewRankEnd=&CustReviewCountStart=&CustReviewCountEnd=&PriceFilterMin=&PriceFilterMax=&MusicFilter=").get();
 
-                        for(int j = 0; j < 25; j++) {
-                            if(i==1 & j==0){    //첫번째 값 NULL값 없애기 위해
+                        for(; j < i*25; j++) {
+                            if(i==1){
                                 Elements contents = doc.select(".bo3");
-                                nums = contents.get(j).text();
+                                nums.putString("title"+j,contents.get(j).text());
                                 contents = doc.select(".ss_p2");
-                                nums += "   "+ contents.get(j).text();
+                                nums.putString("value"+j,contents.get(j).text());
                             }
-                            else {
+                            else{
                                 Elements contents = doc.select(".bo3");
-                                nums += "\n\n" + contents.get(j).text();
+                                nums.putString("title"+j,contents.get(j-((i-1)*25)).text());    //2번째페이지의 첫번째 데이터는 0부터 시작하기 때문에
                                 contents = doc.select(".ss_p2");
-                                nums += "   "+ contents.get(j).text();
+                                nums.putString("value"+j,contents.get(j-((i-1)*25)).text());    //2번째페이지의 첫번째 데이터는 0부터 시작하기 때문에
                             }
                         }
                     }
 
 
-                    bundle.putString("numbers", nums);                              //핸들러를 이용해서 Thread()에서 가져온 데이터를 메인 쓰레드에 보내준다.
-                    Message msg = handler.obtainMessage();
-                    msg.setData(bundle);
+                    Message msg = handler.obtainMessage();  //핸들러를 이용해서 Thread()에서 가져온 데이터를 메인 쓰레드에 보내준다.
+                    msg.setData(nums);
                     handler.sendMessage(msg);
 
                 } catch (IOException e) {
@@ -74,9 +74,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
-            textView.setText(bundle.getString("numbers"));                      //이런식으로 View를 메인 쓰레드에서 뿌려줘야한다.
+            textView.setText(bundle.getString("title26"));   //이런식으로 View를 메인 쓰레드에서 뿌려줘야한다.
         }
     };
+
 }
 
 
