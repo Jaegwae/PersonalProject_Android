@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    bundle.putString("numbers", nums);                               //핸들러를 이용해서 Thread()에서 가져온 데이터를 메인 쓰레드에 보내준다.
+                    bundle.putString("numbers", nums);                              //핸들러를 이용해서 Thread()에서 가져온 데이터를 메인 쓰레드에 보내준다.
                     Message msg = handler.obtainMessage();
                     msg.setData(bundle);
                     handler.sendMessage(msg);
