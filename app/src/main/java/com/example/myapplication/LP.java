@@ -1,5 +1,8 @@
 package com.example.myapplication;
 
+import android.graphics.Bitmap;
+import android.media.Image;
+
 public class LP {
     String title;
     String value;

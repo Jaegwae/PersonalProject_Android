@@ -4,8 +4,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/input_title"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:hint="LP제목을 입력하세요" />
+
+        <Button
+            android:id="@+id/button_search"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="검색" />
+    </LinearLayout>
+
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:layout_weight="1"
+            android:text="알라딘"
+            android:id="@+id/aladin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <RadioButton
+            android:layout_weight="1"
+            android:text="예스24"
+            android:id="@+id/yes24"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <RadioButton
+            android:layout_weight="1"
+            android:text="김밥레코즈"
+            android:id="@+id/gimbob"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </RadioGroup>
 
     <ListView
         android:id="@+id/listview"
@@ -14,8 +64,6 @@
         android:fillViewport="true"
         android:scrollbars="none"
         tools:listitem="@layout/cardview">
-
-
     </ListView>
 
 </LinearLayout>
